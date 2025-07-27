@@ -1,9 +1,9 @@
 ---
-title: Deenote dev - NAudio读取带封面
-published: 2025-7-27
+title: Deenote dev - NAudio读取带封面mp3
+published: 2025-07-27
 description: 关于修复NAudio对mp3文件ID3 tag的处理.
 tags: [Deenote, C#, NAudio, mp3]
-category: Deenote dev
+category: Deenote
 draft: false
 ---
 
