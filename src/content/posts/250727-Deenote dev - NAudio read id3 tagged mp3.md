@@ -4,7 +4,7 @@ published: 2025-07-27
 description: 关于修复NAudio对mp3文件ID3 tag的处理.
 tags: [Deenote, C#, NAudio, mp3]
 category: Deenote
-draft: false
+draft: true
 ---
 
 Deenote 1.0.4终于修复了鸽了十万年的带封面mp3导入的问题。由于笔者本地使用foobar2000管理Deemo收录曲时添加了自定义tag，导致dnt无法直接读取，于是在今天测试的时候顺手查了下如何修复。
