@@ -7,9 +7,9 @@ category: C#
 draft: false
 ---
 
-::: note
-本文为[dotnet/roslyn](https://github.com/dotnet/roslyn)项目中[incremental-genrators.cookbook.md](https://github.com/dotnet/roslyn/blob/73ea6887cb8abecabf3dcd3b8109d4336690afe9/docs/features/incremental-generators.cookbook.md)文档的中文翻译，原文由.NET团队撰写，并采用MIT License发布。
-:::
+> [!NOTE]
+> 本文为[dotnet/roslyn](https://github.com/dotnet/roslyn)项目中[incremental-genrators.cookbook.md](https://github.com/dotnet/roslyn/blob/73ea6887cb8abecabf3dcd3b8109d4336690afe9/docs/features/incremental-generators.cookbook.md)文档的中文翻译，原文由.NET团队撰写，并采用MIT License发布。
+
 
 # 译者序
 
