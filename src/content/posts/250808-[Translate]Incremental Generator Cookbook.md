@@ -9,7 +9,7 @@ draft: false
 
 ::: note
 本文为[dotnet/roslyn](https://github.com/dotnet/roslyn)项目中[incremental-genrators.cookbook.md](https://github.com/dotnet/roslyn/blob/73ea6887cb8abecabf3dcd3b8109d4336690afe9/docs/features/incremental-generators.cookbook.md)文档的中文翻译，原文由.NET团队撰写，并采用MIT License发布。
-::: note
+:::
 
 # 译者序
 
@@ -37,6 +37,25 @@ draft: false
     - [语言特性](#语言特性)
     - [代码重写](#代码重写)
   - [约定](#约定)
+    - [流水线模型设计](#流水线模型设计)
+    - [使用`ForAttributeWithMetadataName`](#使用forattributewithmetadataname)
+    - [使用缩进文本编写器(indented text writer)，而非`SyntaxNode`进行生成](#使用缩进文本编写器indented-text-writer而非syntaxnode进行生成)
+    - [将`Microsoft.CodeAnalysis.EmbededAttribute`标记在生成的标记类型上](#将microsoftcodeanalysisembededattribute标记在生成的标记类型上)
+    - [不要查找非直接实现的接口、非直接继承的类型、或从接口、基类继承的非直接标记的Attribute](#不要查找非直接实现的接口非直接继承的类型或从接口基类继承的非直接标记的attribute)
+  - [设计](#设计)
+    - [生成类](#生成类)
+    - [转换附加文件](#转换附加文件)
+    - [增强用户代码](#增强用户代码)
+    - [发出诊断](#发出诊断)
+    - [INotifyPropertyChanged](#inotifypropertychanged)
+    - [将生成器打包进NuGet包](#将生成器打包进nuget包)
+    - [使用NuGet包提供的功能](#使用nuget包提供的功能)
+    - [访问分析器配置属性](#访问分析器配置属性)
+    - [使用MSBuild属性与元数据](#使用msbuild属性与元数据)
+    - [生成器的单元测试](#生成器的单元测试)
+    - [自动实现接口](#自动实现接口)
+  - [破坏性更改](#破坏性更改)
+  - [未解决的问题](#未解决的问题)
 
 ## 提案
 
@@ -121,9 +140,9 @@ draft: false
 
 ### 生成类
 
-**用户场景：**我希望将某个类型添加到编译中，并且可以被用户的代码引用。一般的案例包括创建一个可用于其他生成器的Attribute。
+**用户场景：** 我希望将某个类型添加到编译中，并且可以被用户的代码引用。一般的案例包括创建一个可用于其他生成器的Attribute。
 
-**解决方案：**让用户如同类型已经存在一样编写代码。使用`RegisterPostInitializationOutput`根据编译信息生成缺少的类型。
+**解决方案：** 让用户如同类型已经存在一样编写代码。使用`RegisterPostInitializationOutput`根据编译信息生成缺少的类型。
 
 **示例：**
 
@@ -164,13 +183,13 @@ public class CustomGenerator : IIncrementalGenerator
 }
 ```
 
-**其他方案**：如果你为用户提供了一个类库，除了使用源生成器，也可以直接在类库中包含Attribute定义。
+**其他方案：** 如果你为用户提供了一个类库，除了使用源生成器，也可以直接在类库中包含Attribute定义。
 
 ### 转换附加文件
 
-**用户场景：**我希望能够将外部的非C#文件转化为等效的C#表示。
+**用户场景：** 我希望能够将外部的非C#文件转化为等效的C#表示。
 
-**解决方案：**使用`AdditionalTextsProvider`来筛选并获取你想要的文件。将其转化为你的类型，并将代码输出进解决方案。
+**解决方案：** 使用`AdditionalTextsProvider`来筛选并获取你想要的文件。将其转化为你的类型，并将代码输出进解决方案。
 
 **示例：**
 
@@ -209,9 +228,9 @@ public class FileTransformGenerator : IIncrementalGenerator
 
 ### 增强用户代码
 
-**用户场景：**我希望能够检查并为用户代码增加新功能。
+**用户场景：** 我希望能够检查并为用户代码增加新功能。
 
-**解决方案：**需要用户将你想增强的类改为`partial class`，并使用一个特性标注。在`RegisterPostInitializationOutput`中提供这个特性类。使用`ForAttributeWithMetadataName`在该特性上注册回调以收集生成代码所需的信息，使用元组（或自定义值相等模型）来传递信息。传递的信息应当从语法和Symbol获取，**切忌将语法和Symbol对象直接放入模型类**。
+**解决方案：** 需要用户将你想增强的类改为`partial class`，并使用一个特性标注。在`RegisterPostInitializationOutput`中提供这个特性类。使用`ForAttributeWithMetadataName`在该特性上注册回调以收集生成代码所需的信息，使用元组（或自定义值相等模型）来传递信息。传递的信息应当从语法和Symbol获取，**切忌将语法和Symbol对象直接放入模型类**。
 
 **示例：**
 
@@ -278,17 +297,17 @@ public class AugmentingGenerator : IIncrementalGenerator
 }
 ```
 
-### 问题诊断
+### 发出诊断
 
-**用户场景：**我希望能够为用户的编译过程添加诊断。
+**用户场景：** 我希望能够为用户的编译过程添加诊断。
 
-**解决方案：**我们不推荐通过生成器添加诊断。这可行，但在不破坏增量性质的前提下做到这一点是超出了本手册的范围的高级话题。作为代替，我们建议使用额外的分析器来报告诊断。
+**解决方案：** 我们不推荐通过生成器添加诊断。这可行，但在不破坏增量性质的前提下做到这一点是超出了本手册的范围的高级话题。作为代替，我们建议使用额外的分析器来报告诊断。
 
 ### INotifyPropertyChanged
 
-**用户场景：**我希望自动为用户实现`INotifyPropertyChanged`模式。
+**用户场景：** 我希望自动为用户实现`INotifyPropertyChanged`模式。
 
-**解决方案：**“明确只允许添加”的设计宗旨似乎与实现该功能的能力相悖，这项功能似乎需要修改用户代码。但是我们可以充分发挥使用显示字段定义而不是*修改*用户定义的属性，直接通过字段提供该功能。
+**解决方案：** “明确只允许添加”的设计宗旨似乎与实现该功能的能力相悖，这项功能似乎需要修改用户代码。但是我们可以充分发挥使用显示字段定义而不是*修改*用户定义的属性，直接通过字段提供该功能。
 
 **示例：**
 
@@ -354,9 +373,9 @@ public partial class UserClass : INotifyPropertyChanged
 
 ### 将生成器打包进NuGet包
 
-**用户场景：**我希望将生成器打包为NuGet包使用。
+**用户场景：** 我希望将生成器打包为NuGet包使用。
 
-**解决方案：**生成器可以用与打包分析器相同的方法打包。保证生成器放在包的`analyzer\dotnet\cs`文件夹下，这样就会在安装时自动添加到用户项目。
+**解决方案：** 生成器可以用与打包分析器相同的方法打包。保证生成器放在包的`analyzer\dotnet\cs`文件夹下，这样就会在安装时自动添加到用户项目。
 
 比如，要在构建时生成器打包进NuGet包，将以下内容添加到你的项目文件
 
@@ -374,9 +393,9 @@ public partial class UserClass : INotifyPropertyChanged
 
 ### 使用NuGet包提供的功能
 
-**用户场景：**我希望在生成器中使用NuGet包提供的功能。
+**用户场景：** 我希望在生成器中使用NuGet包提供的功能。
 
-**解决方案：**在生成器中使用NuGet包是可能的，但是在发布时有些需要特别考虑的情况。
+**解决方案：** 在生成器中使用NuGet包是可能的，但是在发布时有些需要特别考虑的情况。
 
 对于任何*运行时*依赖，也就是用户的程序需要依赖的代码，可以通过通常的引用机制添加为生成器NuGet包的依赖。
 
@@ -470,7 +489,7 @@ public class JsonUsingGenerator : IIncrementalGenerator
 - 作为作者，我希望访问访问键值对来自定义生成器输出。
 - 作为用户，我希望使用时能够自定义生成的代码，覆盖默认配置。
 
-**解决方案：**生成器可以通过`AnalyzerConfigOptionsProvider`访问分析器配置值。分析器配置值可以通过`SyntaxTree`、`AdditionalFile`访问，也可以通过`GlobalOptions`全局访问。全局选项是“环境”选项，不适用于任何特定上下文，但在通过特定上下文请求时会被包括在内。
+**解决方案：** 生成器可以通过`AnalyzerConfigOptionsProvider`访问分析器配置值。分析器配置值可以通过`SyntaxTree`、`AdditionalFile`访问，也可以通过`GlobalOptions`全局访问。全局选项是“环境”选项，不适用于任何特定上下文，但在通过特定上下文请求时会被包括在内。
 
 注意这是少数几种需要将`SyntaxNode`放入流水线的情况之一，你需要语法树来获取生成器选项。请尽快将`SyntaxNode`移出流水线以避免模型无法正确判等。
 
@@ -505,7 +524,7 @@ public class MyGenerator : IIncrementalGenerator
 - 作为作者，我希望基于项目文件中包含的值进行决定
 - 作为用户，我希望能够自定义生成的代码，覆盖默认配置。
 
-**解决方案：**MSBuild会将指定属性和元数据自动转换为全局分析器配置，以此可以被生成器读取。生成器作者通过添加`CompilerVisibleProperty`和`CompilerVisibleItemMetadata`到ItemGroup来启用特定的属性和元数据。可以通过props或targets文件在打包为NuGet包时进行添加。
+**解决方案：** MSBuild会将指定属性和元数据自动转换为全局分析器配置，以此可以被生成器读取。生成器作者通过添加`CompilerVisibleProperty`和`CompilerVisibleItemMetadata`到ItemGroup来启用特定的属性和元数据。可以通过props或targets文件在打包为NuGet包时进行添加。
 
 比如，假设一个生成器通过附加文件创建了代码，并希望那个用户能够通过项目文件启用或关闭日志。作者可以在props文件中指定需要的MSBuild属性对编译器可见：
 
@@ -611,7 +630,7 @@ public class MyGenerator : IIncrementalGenerator
 
 ### 生成器的单元测试
 
-**用户场景：**我希望能够对生成器进行单元测试来确保开发更渐染，并保证正确。
+**用户场景：** 我希望能够对生成器进行单元测试来确保开发更渐染，并保证正确。
 
 **解决方案A：**
 
@@ -628,9 +647,9 @@ TODO: [原文未编写](https://github.com/dotnet/roslyn/issues/72149)
 
 ### 自动实现接口
 
-**用户场景：**我希望能够为用户自动实现作为参数传递给类的标记特性的接口的属性[^4]
+**用户场景：** 我希望能够为用户自动实现作为参数传递给类的标记特性的接口的属性[^4]
 
-**解决方案：**需要用户将类标记为`[AutoImplement]`特性，并将需要自动实现的接口的类型作为参数；标记了改Attribute的类必须为`partial class`。在`RegisterPostInitializationOutput`中提供该Attribute类型。使用`fullyQualifiedMetadataName: FullyQualifiedAttributeName`通过`ForAttributeWithMetadataName`为标记过的类注册回调，然后使用元组（或创建值相等模型）传递信息。Attribute也可以对结构体生效，以下作为指导实例尽量保持简单。
+**解决方案：** 需要用户将类标记为`[AutoImplement]`特性，并将需要自动实现的接口的类型作为参数；标记了改Attribute的类必须为`partial class`。在`RegisterPostInitializationOutput`中提供该Attribute类型。使用`fullyQualifiedMetadataName: FullyQualifiedAttributeName`通过`ForAttributeWithMetadataName`为标记过的类注册回调，然后使用元组（或创建值相等模型）传递信息。Attribute也可以对结构体生效，以下作为指导实例尽量保持简单。
 
 **示例：**
 
@@ -667,7 +686,7 @@ public class AutoImplementGenerator : IIncrementalGenerator
         context.RegisterPostInitializationOutput(ctx =>
         {
             ctx.AddEmbeddedAttributeDefinition();
-            //Generate the AutoImplementProperties Attribute
+            //生成AutoImplementPropertiesAttribute类
             const string autoImplementAttributeDeclarationCode = $$"""
 // <auto-generated/>
 using System;
@@ -723,7 +742,7 @@ internal sealed class {{AttributeClassName}} : Attribute
                     }
                     """);
 
-                //Concat class name and interface name to have unique file name if a class implements two interfaces with AutoImplement Attribute
+                //连接类名和接口名来保证如果一个类使用AutoImplementAttribute实现了两个接口时拥有唯一文件名
                 string generatedFileName = $"{classModel.Name}_{interfaceModel.FullyQualifiedName}.g.cs";
                 context.AddSource(generatedFileName, sourceBuilder.ToString());
             }
@@ -749,7 +768,7 @@ internal sealed class {{AttributeClassName}} : Attribute
                 {
                     string type = interfaceProperty.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
 
-                    //Check if property has a setter
+                    //检查属性是否有setter
                     string setter = interfaceProperty.SetMethod is not null
                         ? "set; "
                         : string.Empty;
@@ -773,13 +792,13 @@ internal sealed class {{AttributeClassName}} : Attribute
     {
         public bool Equals(EquatableList<T>? other)
         {
-            // If the other list is null or a different size, they're not equal
+            // 如果other的列表为null或大小不同，那么两者不想等
             if (other is null || Count != other.Count)
             {
                 return false;
             }
 
-            // Compare each pair of elements for equality
+            // 比较每一对值的相等性
             for (int i = 0; i < Count; i++)
             {
                 if (!EqualityComparer<T>.Default.Equals(this[i], other[i]))
@@ -788,7 +807,7 @@ internal sealed class {{AttributeClassName}} : Attribute
                 }
             }
 
-            // If we got this far, the lists are equal
+            // 如果代码执行到这里，那么两个列表相等
             return true;
         }
         public override bool Equals(object obj)
