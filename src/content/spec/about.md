@@ -1,9 +1,9 @@
 # About
-This is the demo site for [Fuwari](https://github.com/saicaca/fuwari).
 
-::github{repo="saicaca/fuwari"}
+Trarizon的个人Blog
 
-> ### Sources of images used in this site
-> - [Unsplash](https://unsplash.com/)
-> - [星と少女](https://www.pixiv.net/artworks/108916539) by [Stella](https://www.pixiv.net/users/93273965)
-> - [Rabbit - v1.4 Showcase](https://civitai.com/posts/586908) by [Rabbit_YourMajesty](https://civitai.com/user/Rabbit_YourMajesty)
+其实并没有想写什么东西所以单纯只是建着玩（被打
+
+::github{repo="Trarizon/blog"}
+
+> - 个人头像 [藤のカーテン](https://www.pixiv.net/artworks/108613290) by [Renren](https://www.pixiv.net/users/22963369)
