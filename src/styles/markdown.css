@@ -58,12 +58,12 @@
         }
     }
 
-    .expressive-code pre.wrap .ec-line .code{
+    .expressive-code pre.wrap .ec-line .code {
         white-space: pre !important;
         overflow-wrap: normal !important;
     }
 
-    code{
+    code {
         word-wrap: break-word;
     }
 
