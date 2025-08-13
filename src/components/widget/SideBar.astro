@@ -21,7 +21,7 @@ const isHomePage = Astro.url.pathname === "/";
         <Profile></Profile>
     </div>
     <div id="sidebar-sticky" class="transition-all duration-700 flex flex-col w-full gap-4 top-4 sticky top-4">
-        {tocHeading && tocHeading.length>0 && <TOC class="onload-animation" headings={tocHeading}></TOC>}
+        <!-- {tocHeading && tocHeading.length>0 && <TOC class="onload-animation" headings={tocHeading}></TOC>} -->
         <Categories class="onload-animation" style="animation-delay: 150ms"></Categories>
         <Tag class="onload-animation" style="animation-delay: 200ms"></Tag>
         {isHomePage && <Friends></Friends>}
