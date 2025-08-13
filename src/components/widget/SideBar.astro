@@ -1,6 +1,7 @@
 ---
 import type { MarkdownHeading } from "astro";
 import Categories from "./Categories.astro";
+import Friends from "./Friends.astro";
 import Profile from "./Profile.astro";
 import Tag from "./Tags.astro";
 import TOC from "./TOC.astro";
@@ -12,6 +13,8 @@ interface Props {
 
 const className = Astro.props.class;
 const tocHeading = Astro.props.headings;
+
+const isHomePage = Astro.url.pathname === "/";
 ---
 <div id="sidebar" class:list={[className, "w-full"]}>
     <div class="flex flex-col w-full gap-4 mb-4">
@@ -21,5 +24,6 @@ const tocHeading = Astro.props.headings;
         {tocHeading && tocHeading.length>0 && <TOC class="onload-animation" headings={tocHeading}></TOC>}
         <Categories class="onload-animation" style="animation-delay: 150ms"></Categories>
         <Tag class="onload-animation" style="animation-delay: 200ms"></Tag>
+        {isHomePage && <Friends></Friends>}
     </div>
 </div>

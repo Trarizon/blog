@@ -1,5 +1,6 @@
 import type {
 	ExpressiveCodeConfig,
+	FriendConfig,
 	LicenseConfig,
 	NavBarConfig,
 	ProfileConfig,
@@ -75,6 +76,10 @@ export const profileConfig: ProfileConfig = {
 			url: "https://space.bilibili.com/38334117",
 		},
 	],
+};
+
+export const friendConfig: FriendConfig = {
+	links: [],
 };
 
 export const licenseConfig: LicenseConfig = {
