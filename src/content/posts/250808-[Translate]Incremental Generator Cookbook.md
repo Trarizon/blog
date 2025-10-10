@@ -2,7 +2,7 @@
 title: 【译】增量源生成器使用手册
 published: 2025-08-08
 description: 原标题：Incremental Generators Cookbook
-tags: [C#, Roslyn, 源生成器, 翻译]
+tags: [C#, .NET, Roslyn, 源生成器, 翻译]
 category: C#
 draft: false
 ---
