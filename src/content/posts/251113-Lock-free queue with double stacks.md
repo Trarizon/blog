@@ -38,12 +38,17 @@ class Queue<T>
 于是在群里问了一下。
 
 > Trarizon: 说起来我刚刚技术面的时候被问了怎么用两个stack拼成一个queue
+>
 > Trarizon: 我感觉解法很抽象，有没有会的
+>
 > ...
+>
 > 盐酸: *\*口述了一下上述实现\**
-> 盐酸: 这种算法我可能实现过亿些次，用来做原子的内嵌队列
-> 盐酸: 不是纯toy问题，是有用的
+>
+> 盐酸: 这种算法我可能实现过亿些次，用来做原子的内嵌队列。盐酸: 不是纯toy问题，是有用的
+>
 > 盐酸: 另外为什么会有这种用stack不用list的场景，总之就是atomic queue的话你要维护的invariant太多就只能加锁了
+
 > 盐酸: [睦子米ぜーんぶ弾けなーい.gif]
 
 嗯。。。虽然感觉我用C#写前端遇不到这个场景，但还是去看了一下
@@ -95,33 +100,37 @@ partial class Queue<T>
 {
     public T Dequeue()
     {
-    Retry:
-        var old_out = _out;
-        if (old_out != null)
+        while (true)
         {
-            var new_out = old_out.Next;
-            if (old_out == Interlocked.CompareExchange(ref _out, new_out, old_out))
-                return old_out.Value;
-            goto Retry;
-        }
-
-        var spinner = new SpinWait();
-        if (Interlocked.CompareExchange(ref _transferring, true, false) == false)
-        {
-            var old_in = Interlocked.Exchange(ref _in, null);
-            if (old_in is null) {
-                Interlocked.Exchange(ref _transferring, false);
-                throw new InvalidOperationException("Empty");
+            var old_out = _out;
+            if (old_out != null)
+            {
+                var new_out = old_out.Next;
+                if (old_out == Interlocked.CompareExchange(ref _out, new_out, old_out))
+                    return old_out.Value;
+                goto Retry;
             }
 
-            _out = Reverse(old_in);
-            Interlocked.Exchange(ref _transferring, false);
-            goto Retry;
-        }
-        else
-        {
-            spinner.SpinOnce();
-            goto Retry;
+            // 确保只有一个线程在处理数据转移，其他线程等着就是
+            if (Interlocked.CompareExchange(ref _transferring, true, false) == false)
+            {
+                var old_in = Interlocked.Exchange(ref _in, null);
+                if (old_in is null) {
+                    Interlocked.Exchange(ref _transferring, false);
+                    throw new InvalidOperationException("Empty");
+                }
+
+                _out = Reverse(old_in);
+                Interlocked.Exchange(ref _transferring, false);
+                goto Retry;
+            }
+            else
+            {
+                var spinner = new SpinWait();
+                while (_transferring)
+                    spinner.SpinOnce();
+                goto Retry;
+            }
         }
 
         static Node Reverse([DisallowNull] Node? node)
