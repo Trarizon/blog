@@ -51,3 +51,19 @@ static Comparer<T> Comparer<T>.Create(Comparison<T> cmp)
 
 > [!NOTE]
 > 之前在dotnet/csharplang翻[discussion](https://github.com/dotnet/csharplang/discussions/8583)时提到的一个方法。`Comparer<T>`的版本倒是始终存在，`EqualityComparer`的版本在.NET 8加入了。
+
+### Task.Unwrap
+
+|Release|Blog update|
+|-------|-----------|
+|All    |26-7-8     |
+
+``` c#
+static Task Unwrap(this Task<Task> task);
+static Task<T> Unwrap<T>(this Task<Task<T>> task);
+```
+
+Monad标配unwrap，但是似乎没有ValueTask适配的实现
+
+> [!NOTE]
+> 虽然很理所应当的应该有这个方法，但是我确实没发现过BCL里原来有内置。嵌套Task还是太少见了
